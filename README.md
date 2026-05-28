@@ -23,7 +23,7 @@ Para 2026, anticipamos que el tema podría enfocarse en:
 5. **Mentoría con profesionales de la industria tecnológica**
 
 ## 👥 Nuestro Equipo
-1. ________________________
+1. Jesus Jacinto Fabian
 2. ________________________
 3. ________________________
 4. ________________________
