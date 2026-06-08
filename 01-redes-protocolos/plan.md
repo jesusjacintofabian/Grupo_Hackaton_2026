@@ -136,7 +136,7 @@ Un DevOps trabaja constantemente con aplicaciones, servidores y servicios conect
 - **Práctica:** https://www.packettracer.net/ (simulador)
 - **Labs:** https://tryhackme.com (rutas de redes)
 
-## 9. Conexión con el hackathon
+## 9. Conexión con el Hackathon
 
 Para Copa Airlines — la optimización de rutas de vuelo, APIs de meteorología y sistemas de reserva se modelan como tráfico de red. Entender latencia, jitter y packet loss permite diseñar soluciones edge que respondan en tiempo real.
 
