@@ -1,0 +1,14 @@
+# equipo.cron
+# Tareas programadas para los scripts de administración.
+# Instalar con: crontab crontab/equipo.cron
+# (ajustar las rutas /opt/scripts/ a la ubicación real de los scripts)
+
+# Respaldo diario a las 02:00
+0 2 * * * /opt/scripts/backup-incremental.sh >> /var/log/backup.log 2>&1
+
+# Monitoreo de recursos cada 15 minutos
+*/15 * * * * /opt/scripts/monitor-resources.sh >> /var/log/admin-scripts.l>
+
+# Inventario / chequeo semanal cada lunes a las 08:00
+0 8 * * 1 /opt/scripts/create-users.sh >> /var/log/admin-scripts.log 2>&1
+
