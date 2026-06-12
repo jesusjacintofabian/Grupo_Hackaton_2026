@@ -2,7 +2,7 @@
 
 Suite de scripts administrativos con logging centralizado para Linux (Ubun>
 
-## Estructura
+## Estructura Completa
 
 ```
 02-linux/
