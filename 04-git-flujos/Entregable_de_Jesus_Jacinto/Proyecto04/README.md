@@ -1,28 +1,32 @@
-# Proyecto DevOps Multi Ambiente.
+# Proyecto DevOps Multi Ambiente
+
 
 
 ## Ambientes
 
-- Development
-- Staging
-- Production
+* Development
+* Staging
+* Production
+
 
 
 ## CI/CD
 
 Incluye:
 
-- GitHub Actions
-- Ruff
-- Pytest
-- Semantic Versioning
-- Automated Changelog
+* GitHub Actions
+* Ruff
+* Pytest
+* Semantic Versioning
+* Automated Changelog
+
 
 
 ## Flujo Git
 
 main
- |
- develop
- |
- feature branches
+|
+develop
+|
+feature branches
+
