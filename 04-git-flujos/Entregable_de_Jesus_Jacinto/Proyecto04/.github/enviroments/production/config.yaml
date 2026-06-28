@@ -1,0 +1,4 @@
+environment: production
+debug: false
+database: production_db
+

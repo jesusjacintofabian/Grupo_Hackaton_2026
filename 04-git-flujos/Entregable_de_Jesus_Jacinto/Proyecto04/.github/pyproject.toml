@@ -1,0 +1,18 @@
+[project]
+name = "proyecto-devops"
+version = "0.1.0"
+description = "Proyecto multi ambiente DevOps"
+requires-python = ">=3.12"
+
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov"
+]
+
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "."
+]

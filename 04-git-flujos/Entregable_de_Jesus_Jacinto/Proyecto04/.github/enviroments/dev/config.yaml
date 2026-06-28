@@ -1,0 +1,3 @@
+environment: development
+debug: true
+database: dev_db

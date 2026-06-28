@@ -1,0 +1,3 @@
+environment: staging
+debug: false
+database: staging_db
