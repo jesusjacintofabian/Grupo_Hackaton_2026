@@ -1,0 +1,11 @@
+services:
+
+  api:
+
+    volumes:
+      - ./api:/app
+
+  nginx:
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
