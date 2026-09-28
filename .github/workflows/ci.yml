@@ -173,6 +173,7 @@ jobs:
           context: ${{ env.PROJECT_DIR }}/api
           file: ${{ env.PROJECT_DIR }}/docker/api/Dockerfile
           push: false
+          load: true
           tags: proyecto05-api:ci
 
       - name: Scan Docker image with Trivy
