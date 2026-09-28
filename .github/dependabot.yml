@@ -1,0 +1,12 @@
+version: 2
+
+updates:
+  - package-ecosystem: "pip"
+    directory: "/05-docker/Entregable_de_Jesus_Jacinto/Proyecto05/api"
+    schedule:
+      interval: "weekly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
