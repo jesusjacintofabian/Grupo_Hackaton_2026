@@ -144,7 +144,12 @@ jobs:
 
       - name: Run Bandit
         run: bandit -r api
-
+      - name: Run Snyk
+        uses: snyk/actions/python@v1.0.0
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
 
   docker-build:
     name: Docker Build
