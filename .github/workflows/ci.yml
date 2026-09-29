@@ -153,8 +153,9 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           snyk test \
-            --file=05-docker/Entregable_de_Jesus_Jacinto/Proyecto05/api/requirements.txt \
+            --file=api/requirements.txt \
             --package-manager=pip \
+            --command=python \
             --severity-threshold=high
 
 
@@ -196,3 +197,4 @@ jobs:
           exit-code: "1"
           ignore-unfixed: true
           severity: CRITICAL,HIGH
+
