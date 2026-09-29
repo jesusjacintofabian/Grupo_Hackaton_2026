@@ -5,6 +5,14 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+    inputs:
+      test_rollback:
+        description: "Ejecutar prueba controlada de rollback"
+        required: true
+        default: false
+        type: boolean
+
 permissions:
   contents: read
   packages: write
@@ -33,9 +41,15 @@ jobs:
         id: previous-image
         run: |
           if docker pull "${{ env.IMAGE_NAME }}:latest"; then
-            PREVIOUS_IMAGE="${{ env.IMAGE_NAME }}:latest"
+            PREVIOUS_IMAGE="${{ env.IMAGE_NAME }}:previous-staging"
+
+            docker tag \
+              "${{ env.IMAGE_NAME }}:latest" \
+              "$PREVIOUS_IMAGE"
+
             echo "previous_image=$PREVIOUS_IMAGE" >> "$GITHUB_OUTPUT"
-            echo "Imagen anterior encontrada:"
+
+            echo "Imagen anterior guardada para rollback:"
             echo "$PREVIOUS_IMAGE"
           else
             echo "No existe una imagen anterior."
@@ -68,6 +82,15 @@ jobs:
             -p 8000:8000 \
             "${{ env.IMAGE_NAME }}:${{ github.sha }}"
 
+      - name: Force health check failure for rollback test
+        if: github.event_name == 'workflow_dispatch' && inputs.test_rollback == true
+        run: |
+          echo "PRUEBA DE ROLLBACK ACTIVADA."
+          echo "Deteniendo temporalmente el contenedor para provocar"
+          echo "un fallo controlado del health check."
+
+          docker stop proyecto05-api-staging
+
       - name: Health check
         id: health-check
         continue-on-error: true
@@ -86,7 +109,11 @@ jobs:
           done
 
           echo "Health check fallido."
-          docker logs proyecto05-api-staging
+
+          if docker ps -a --format '{{.Names}}' | grep -q "^proyecto05-api-staging$"; then
+            docker logs proyecto05-api-staging
+          fi
+
           exit 1
 
       - name: Automatic rollback
@@ -97,7 +124,8 @@ jobs:
 
           docker rm -f proyecto05-api-staging 2>/dev/null || true
 
-          docker pull "${{ steps.previous-image.outputs.previous_image }}"
+          echo "Restaurando imagen anterior:"
+          echo "${{ steps.previous-image.outputs.previous_image }}"
 
           docker run -d \
             --name proyecto05-api-staging \
