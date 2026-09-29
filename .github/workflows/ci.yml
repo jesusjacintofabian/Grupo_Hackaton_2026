@@ -149,7 +149,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high
+         args: --file=api/requirements.txt --severity-threshold=high
 
   docker-build:
     name: Docker Build
