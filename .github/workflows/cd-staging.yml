@@ -14,13 +14,11 @@ env:
   IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/proyecto05-api
 
 jobs:
-
-  build-and-push:
-    name: Build and Push Docker Image
+  build-and-deploy:
+    name: Build, Deploy and Rollback Staging
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -31,10 +29,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get previous staging image
+        id: previous-image
+        run: |
+          if docker pull "${{ env.IMAGE_NAME }}:latest"; then
+            PREVIOUS_IMAGE="${{ env.IMAGE_NAME }}:latest"
+            echo "previous_image=$PREVIOUS_IMAGE" >> "$GITHUB_OUTPUT"
+            echo "Imagen anterior encontrada:"
+            echo "$PREVIOUS_IMAGE"
+          else
+            echo "No existe una imagen anterior."
+            echo "previous_image=" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and Push
+      - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: ${{ env.PROJECT_DIR }}/api
@@ -46,37 +57,22 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-
-  deploy-staging:
-    name: Deploy to Staging
-    needs: build-and-push
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Pull staging image
+      - name: Deploy new staging image
         run: |
-          docker pull ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker pull "${{ env.IMAGE_NAME }}:${{ github.sha }}"
 
-      - name: Deploy container
-        run: |
           docker rm -f proyecto05-api-staging 2>/dev/null || true
 
           docker run -d \
             --name proyecto05-api-staging \
             -p 8000:8000 \
-            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            "${{ env.IMAGE_NAME }}:${{ github.sha }}"
 
       - name: Health check
+        id: health-check
+        continue-on-error: true
         run: |
-          echo "Esperando que la API esté disponible..."
+          echo "Verificando salud de Staging..."
 
           for i in {1..10}; do
             if curl --fail --silent http://localhost:8000/health; then
@@ -93,7 +89,47 @@ jobs:
           docker logs proyecto05-api-staging
           exit 1
 
+      - name: Automatic rollback
+        if: steps.health-check.outcome == 'failure' && steps.previous-image.outputs.previous_image != ''
+        run: |
+          echo "Health check fallido."
+          echo "Iniciando rollback automático..."
+
+          docker rm -f proyecto05-api-staging 2>/dev/null || true
+
+          docker pull "${{ steps.previous-image.outputs.previous_image }}"
+
+          docker run -d \
+            --name proyecto05-api-staging \
+            -p 8000:8000 \
+            "${{ steps.previous-image.outputs.previous_image }}"
+
+          echo "Verificando imagen restaurada..."
+
+          for i in {1..10}; do
+            if curl --fail --silent http://localhost:8000/health; then
+              echo
+              echo "Rollback completado correctamente."
+              exit 0
+            fi
+
+            echo "Intento $i/10: servicio restaurado todavía no disponible..."
+            sleep 5
+          done
+
+          echo "El rollback también falló."
+          docker logs proyecto05-api-staging
+          exit 1
+
+      - name: Fail deployment after rollback
+        if: steps.health-check.outcome == 'failure' && steps.previous-image.outputs.previous_image == ''
+        run: |
+          echo "Health check fallido."
+          echo "No existe una imagen anterior para realizar rollback."
+          exit 1
+
       - name: Verify deployment
+        if: steps.health-check.outcome == 'success'
         run: |
           echo "Staging desplegado correctamente."
           docker ps
