@@ -146,14 +146,20 @@ jobs:
         run: bandit -r api
       - name: Run Snyk
         uses: snyk/actions/python@v1.0.0
-      - name: Install project dependencies for Snyk
+            - name: Install project dependencies for Snyk
         run: pip install -r api/requirements.txt
+
+      - name: Install Snyk CLI
+        run: npm install --global snyk
+
       - name: Run Snyk
-        uses: snyk/actions/python@v1.0.0
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-         args: --file=05-docker/Entregable_de_Jesus_Jacinto/Proyecto05/api/requirements.txt --severity-threshold=high
+        run: |
+          snyk test \
+            --file=05-docker/Entregable_de_Jesus_Jacinto/Proyecto05/api/requirements.txt \
+            --package-manager=pip \
+            --severity-threshold=high
 
   docker-build:
     name: Docker Build
