@@ -1,0 +1,16 @@
+name: Slack Notification
+
+on:
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send test message to Slack
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            --data '{"text":"✅ GitHub Actions está conectado correctamente con Slack."}' \
+            "${{ secrets.SLACK_WEBHOOK_URL }}"
