@@ -1,16 +1,20 @@
 name: Slack Notification
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Continuous Integration
+    types:
+      - completed
 
 jobs:
   notify:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Send test message to Slack
+      - name: Send CI result to Slack
         run: |
           curl -X POST \
             -H "Content-Type: application/json" \
-            --data '{"text":"✅ GitHub Actions está conectado correctamente con Slack."}' \
+            --data '{"text":"GitHub Actions - Continuous Integration terminó con estado: ${{ github.event.workflow_run.conclusion }}"}' \
             "${{ secrets.SLACK_WEBHOOK_URL }}"
