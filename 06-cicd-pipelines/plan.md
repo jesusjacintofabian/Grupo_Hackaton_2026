@@ -205,7 +205,7 @@ jobs:
 - [ ] CI corre lint + test + security en cada PR
 - [ ] Build automático de imagen Docker al mergear a main
 - [ ] Deploy a staging automático con health checks
-- [ ] Rollback automático si falla el health check
+- [x] Rollback automático si falla el health check
 - [ ] Notificaciones a Slack/email funcionan
 - [ ] Promotion a producción con approval manual
 - [ ] Proyecto 06 entregado y deploy verificable

@@ -227,7 +227,7 @@ networks:
 - [ ] Separo redes frontend/backend
 - [ ] Persisto datos en volúmenes
 - [ ] Publico imágenes con tags semánticos
-- [ ] Proyecto 05 entregado, `docker compose up` funciona limpio
+- [x] Proyecto 05 entregado, `docker compose up` funciona limpio
 
 ## 8. Recursos recomendados
 
